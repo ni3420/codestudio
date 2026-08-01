@@ -1,15 +1,28 @@
-import { Hono } from 'hono'
-import { handle } from 'hono/vercel'
+import { Hono } from 'hono';
+import { handle } from 'hono/vercel';
+import { projectsRouter } from '@/features/projects/server/route';
 
-const app = new Hono().basePath('/api')
+const app = new Hono().basePath('/api');
 
-app.get('/hello', (c) => {
-  return c.json({
-    message: 'Hello Next.js!',
-  })
-})
+// Global Server-Side Error Handler
+app.onError((err, c) => {
+  console.error('[Hono Server Error]:', err);
+  
+  return c.json(
+    {
+      success: false,
+      message: err.message || 'Internal Server Error',
+    },
+    500
+  );
+});
 
-export const GET = handle(app)
-export const POST = handle(app)
+// Mounted Routes
+const routes = app.route('/projects', projectsRouter);
 
-export type AppType = typeof app
+export const GET = handle(app);
+export const POST = handle(app);
+export const DELETE = handle(app);
+export const PATCH = handle(app);
+
+export type AppType = typeof routes;
