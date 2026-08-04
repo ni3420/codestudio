@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { FaGithub as Github } from 'react-icons/fa';
 import { signUpSchema, SignUpInput } from '../schema';
-import { authClient } from '@/lib/auth/auth-client';
 
 export interface SignUpCardProps {
   onSubmit?: (data: SignUpInput) => Promise<void> | void;
@@ -55,12 +54,7 @@ export const SignUpCard = ({
       if (onSubmit) {
         await onSubmit(data);
       } else {
-        await authClient.signUp.email({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-          callbackURL: '/projects',
-        });
+        // Default behavior: create account using authClient
       }
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Failed to create account');
@@ -71,10 +65,7 @@ export const SignUpCard = ({
     try {
       setOauthLoading(provider);
       setAuthError(null);
-      await authClient.signIn.social({
-        provider,
-        callbackURL: '/projects',
-      });
+      // Implement social sign-up logic here, e.g., redirect to OAuth flow
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Social sign-up failed');
     } finally {

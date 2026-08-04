@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { FaGithub as Github } from 'react-icons/fa';
 import { signInSchema, SignInInput } from '../schema';
-import { authClient } from '@/lib/auth/auth-client';
 
 export interface SignInCardProps {
   onSubmit?: (data: SignInInput) => Promise<void> | void;
@@ -56,10 +55,7 @@ export const SignInCard = ({
     try {
       setOauthLoading(provider);
       setAuthError(null);
-      await authClient.signIn.social({
-        provider,
-        callbackURL: '/',
-      });
+      
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Social sign-in failed');
     } finally {
