@@ -1,11 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { Bell, Command, User, Settings, LogOut } from 'lucide-react';
+import { Bell, Command } from 'lucide-react';
+import { UserButton,useUser } from '@clerk/nextjs';
 
 export const HeaderUserMenu = React.memo(function HeaderUserMenu() {
-  const [isOpen, setIsOpen] = React.useState(false);
-
+const {isSignedIn}=useUser()
   return (
     <div className="flex items-center gap-2">
       {/* Search / Command K Shortcut trigger */}
@@ -33,33 +33,13 @@ export const HeaderUserMenu = React.memo(function HeaderUserMenu() {
 
       {/* Profile Avatar Dropdown Placeholder */}
       <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-primary/10 text-primary font-bold text-xs hover:ring-2 hover:ring-ring transition-all"
-          aria-label="User Account Menu"
-        >
-          CS
+        {!isSignedIn?<>
+        <button>
+          Login
         </button>
-
-        {isOpen && (
-          <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card p-1.5 shadow-xl text-card-foreground z-50 animate-in fade-in-50 zoom-in-95">
-            <div className="px-2 py-1.5 border-b border-border mb-1">
-              <p className="text-xs font-semibold">Nitin</p>
-              <p className="text-[10px] text-muted-foreground truncate">developer@codestudio.io</p>
-            </div>
-            <button className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-              <User className="h-3.5 w-3.5" /> Profile
-            </button>
-            <button className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground">
-              <Settings className="h-3.5 w-3.5" /> Account Settings
-            </button>
-            <div className="my-1 border-t border-border" />
-            <button className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-destructive hover:bg-destructive/10">
-              <LogOut className="h-3.5 w-3.5" /> Log out
-            </button>
-          </div>
-        )}
+        </>:<>
+        <UserButton/>
+        </>}
       </div>
     </div>
   );

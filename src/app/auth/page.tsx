@@ -5,9 +5,18 @@ import Link from 'next/link';
 import { Code2, Sparkles, Terminal, Users2, ShieldCheck } from 'lucide-react';
 import { SignInCard } from '@/features/auth/components/signInCard';
 import { SignUpCard } from '@/features/auth/components/signUpCard';
-
+import { useUser } from '@clerk/nextjs';
+import {useRouter} from "next/navigation"
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = React.useState(false);
+  const { isLoaded, isSignedIn } = useUser();
+    const router = useRouter();
+  React.useEffect(() => {
+      if (isLoaded && isSignedIn) {
+        router.push("/");
+      }
+    }, [isLoaded, isSignedIn, router]);
+  
 
   return (
     <div className="relative flex min-h-screen w-full bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary">

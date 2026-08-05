@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "@/providers/tanstackQuery";
 import { ThemeProvider } from "@/providers/theme-provider";
 import {Toaster} from "sonner"
+import {ClerkProvider} from "@clerk/nextjs"
+import { ConvexClientProvider } from "@/providers/ConvexClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +35,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html
       lang="en"
@@ -40,12 +43,19 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary">
+            <ClerkProvider>
+
         <Providers>
           <ThemeProvider>
-            <Toaster />
+              <ConvexClientProvider>
+                  <Toaster />
             {children}
+              </ConvexClientProvider>
+            
             </ThemeProvider>
         </Providers>
+            </ClerkProvider>
+
       </body>
     </html>
   );

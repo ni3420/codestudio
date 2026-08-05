@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { FaGithub as Github } from 'react-icons/fa';
 import { signUpSchema, SignUpInput } from '../schema';
+import { useSignUp } from '@clerk/nextjs';
+import {toast} from "sonner"
 
 export interface SignUpCardProps {
   onSubmit?: (data: SignUpInput) => Promise<void> | void;
@@ -33,6 +35,7 @@ export const SignUpCard = ({
   const [showPassword, setShowPassword] = React.useState(false);
   const [oauthLoading, setOauthLoading] = React.useState<'github' | 'google' | null>(null);
   const [authError, setAuthError] = React.useState<string | null>(null);
+  const {signUp}=useSignUp()
 
   const {
     register,
@@ -53,9 +56,8 @@ export const SignUpCard = ({
       setAuthError(null);
       if (onSubmit) {
         await onSubmit(data);
-      } else {
-        // Default behavior: create account using authClient
-      }
+        await signUp.create(data)
+      } 
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Failed to create account');
     }
@@ -65,7 +67,19 @@ export const SignUpCard = ({
     try {
       setOauthLoading(provider);
       setAuthError(null);
-      // Implement social sign-up logic here, e.g., redirect to OAuth flow
+      
+    const { error } = await signUp.sso({
+      strategy:`oauth_${provider}`,
+      redirectCallbackUrl: '/sso-callback',
+      redirectUrl: '/', // Learn more about session tasks at https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
+    })
+    if (error) {
+      console.error(JSON.stringify(error, null, 2))
+      toast.error(error.message)
+      return
+    }else{
+      toast.success("user successfully Register")
+    }
     } catch (err) {
       setAuthError(err instanceof Error ? err.message : 'Social sign-up failed');
     } finally {
@@ -238,6 +252,7 @@ export const SignUpCard = ({
           )}
         </div>
 
+<div id="clerk-captcha" />
         {/* Submit */}
         <button
           type="submit"

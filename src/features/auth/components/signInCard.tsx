@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import {useSignIn} from "@clerk/nextjs"
 import {
   Eye,
   EyeOff,
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import { FaGithub as Github } from 'react-icons/fa';
 import { signInSchema, SignInInput } from '../schema';
+import {toast} from "sonner"
 
 export interface SignInCardProps {
   onSubmit?: (data: SignInInput) => Promise<void> | void;
@@ -32,6 +34,7 @@ export const SignInCard = ({
   const [showPassword, setShowPassword] = React.useState(false);
   const [oauthLoading, setOauthLoading] = React.useState<'github' | 'google' | null>(null);
   const [authError, setAuthError] = React.useState<string | null>(null);
+  const {signIn}=useSignIn()
 
   const {
     register,
@@ -48,21 +51,38 @@ export const SignInCard = ({
   const handleFormSubmit = async (data: SignInInput) => {
     if (onSubmit) {
       await onSubmit(data);
+      await signIn.create(data)
     }
   };
 
   const handleSocialSignIn = async (provider: 'github' | 'google') => {
-    try {
-      setOauthLoading(provider);
-      setAuthError(null);
-      
-    } catch (err) {
-      setAuthError(err instanceof Error ? err.message : 'Social sign-in failed');
-    } finally {
-      setOauthLoading(null);
-    }
-  };
+  try {
+    setOauthLoading(provider);
+    setAuthError(null);
 
+    const Session = await signIn.sso({
+      strategy:`oauth_${provider}`,
+      redirectCallbackUrl: '/sso-callback',
+      redirectUrl: '/', // Learn more about session tasks at https://clerk.com/docs/guides/development/custom-flows/authentication/session-tasks
+    })
+
+
+    if (Session.error) {
+      console.error(JSON.stringify(error, null, 2))
+      toast.error(error)
+      return
+    }else{
+      toast.success('user successfully login')
+    }
+  } catch (err) {
+    console.log("OAuth error:", err);
+    setAuthError(
+      err instanceof Error ? err.message : "Social sign-in failed"
+    );
+  } finally {
+    setOauthLoading(null);
+  }
+};
   const currentError = error || authError;
   const isPending = isLoading || oauthLoading !== null;
 
