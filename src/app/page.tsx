@@ -10,17 +10,38 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import LoadingSpinner from '@/components/loading-spinner';
-
+import {api} from "@/lib/convex"
+import { useMutation } from 'convex/react';
 export default function LandingPage() {
-  const { isLoaded, isSignedIn } = useUser();
+  const { isLoaded, isSignedIn,user } = useUser();
   const router = useRouter();
+  const syncUser=useMutation(api.user.CreateUser)
 
-  useEffect(() => {
-    // Only redirect to auth if Clerk is done loading and user is signed out
+  
+useEffect(() => {
+    // 1. Redirect if auth state is resolved and user is signed out
     if (isLoaded && !isSignedIn) {
       router.push("/auth");
+      return;
     }
-  }, [isLoaded, isSignedIn, router]);
+
+    if (user) {
+      const init = async () => {
+        try {
+         await syncUser({
+            Id:user.id,
+            email: user.primaryEmailAddress?.emailAddress || user.emailAddresses[0]?.emailAddress || "",
+            name: user.fullName || user.username || "",
+          });
+          
+        } catch (error) {
+          console.error("Failed to sync user to Convex:", error);
+        }
+      };
+
+      init();
+    }
+  }, [isLoaded, isSignedIn, user, router, syncUser]);
 
   if (!isLoaded) {
     return <LoadingSpinner size="lg" text="Loading CodeStudio..." fullScreen />;
