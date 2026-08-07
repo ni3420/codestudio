@@ -1,0 +1,18 @@
+# Ignore specific files
+secret.key
+
+# Ignore logs and temp files in root
+*.log
+*.tmp
+
+# Ignore logs and temp files anywhere
+**/*.log
+**/*.tmp
+.env
+
+# Ignore entire directories
+node_modules/
+.git/
+
+# Re-include a specific file
+!README.md   
