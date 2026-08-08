@@ -8,7 +8,7 @@ export const HeaderUserMenu = React.memo(function HeaderUserMenu() {
 const {isSignedIn}=useUser()
   return (
     <div className="flex items-center gap-2">
-      {/* Search / Command K Shortcut trigger */}
+      {/* Search / Command K Shortcut trigger
       <button
         type="button"
         className="hidden sm:flex items-center gap-2 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground hover:border-primary/50 transition-colors"
@@ -21,7 +21,7 @@ const {isSignedIn}=useUser()
         </kbd>
       </button>
 
-      {/* Notifications Button */}
+      
       <button
         type="button"
         className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-card-foreground hover:bg-accent transition-colors"
@@ -29,7 +29,7 @@ const {isSignedIn}=useUser()
       >
         <Bell className="h-4 w-4 text-muted-foreground" />
         <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-primary" />
-      </button>
+      </button> */}
 
       {/* Profile Avatar Dropdown Placeholder */}
       <div className="relative">

@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as projects from "../projects.js";
+import type * as projectsfiles from "../projectsfiles.js";
 import type * as user from "../user.js";
 
 import type {
@@ -17,6 +19,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  projects: typeof projects;
+  projectsfiles: typeof projectsfiles;
   user: typeof user;
 }>;
 
