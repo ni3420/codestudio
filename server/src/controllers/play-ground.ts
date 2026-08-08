@@ -6,6 +6,7 @@ const app = new Hono()
 .post("/", zValidator("json", PlayGroundTypes), async (c) => {
   try {
     const { code, language } = c.req.valid("json");
+    console.log("code", code);
 
     let extension = "";
     let command: string[] = [];
@@ -27,34 +28,138 @@ const app = new Hono()
         command = ["node", file];
         break;
 
-      case "cpp":
-        extension = "cpp";
+        case "typescript":
+        extension = "ts";
         file = `/tmp/${id}.${extension}`;
-
-        const output = `/tmp/${id}`;
-
         await Bun.write(file, code);
-
-        const compile = Bun.spawn([
-          "g++",
-          file,
-          "-o",
-          output,
-        ]);
-
-        const compileError = await new Response(
-          compile.stderr
-        ).text();
-
-        if (compileError) {
-          return c.json({
-            success: false,
-            error: compileError,
-          });
-        }
-
-        command = [output];
+        command = ["bun", "run", file];
         break;
+case "cpp": {
+  extension = "cpp";
+  file = `/tmp/${id}.${extension}`;
+
+  const output = `/tmp/${id}`;
+
+  await Bun.write(file, code);
+
+  const compile = Bun.spawn([
+    "g++",
+    file,
+    "-o",
+    output,
+  ]);
+
+  const compileError = await new Response(
+    compile.stderr
+  ).text();
+
+  const exitCode = await compile.exited;
+
+  if (exitCode !== 0) {
+    return c.json({
+      success: false,
+      error: compileError,
+    });
+  }
+
+  command = [output];
+  break;
+}
+case "c":
+  extension = "c";
+  file = `/tmp/${id}.${extension}`;
+
+  const output = `/tmp/${id}`;
+
+  await Bun.write(file, code);
+
+  const compile = Bun.spawn([
+    "gcc",
+    file,
+    "-o",
+    output,
+  ]);
+
+  const compileError = await new Response(
+    compile.stderr
+  ).text();
+
+  const exitCode = await compile.exited;
+
+  if (exitCode !== 0) {
+    return c.json({
+      success: false,
+      error: compileError,
+    });
+  }
+
+  command = [output];
+  break;
+  case "java": {
+  file = `/tmp/Main.java`;
+
+  await Bun.write(file, code);
+
+  const compile = Bun.spawn([
+    "javac",
+    file,
+  ]);
+
+  const compileError = await new Response(
+    compile.stderr
+  ).text();
+
+  const exitCode = await compile.exited;
+
+  if (exitCode !== 0) {
+    return c.json({
+      success: false,
+      error: compileError,
+    });
+  }
+
+  command = [
+    "java",
+    "-cp",
+    "/tmp",
+    "Main",
+  ];
+
+  break;
+}
+case "go": {
+  extension = "go";
+  file = `/tmp/${id}.${extension}`;
+
+  const output = `/tmp/${id}`;
+
+  await Bun.write(file, code);
+
+  const compile = Bun.spawn([
+    "go",
+    "build",
+    "-o",
+    output,
+    file,
+  ]);
+
+  const compileError = await new Response(
+    compile.stderr
+  ).text();
+
+  const exitCode = await compile.exited;
+
+  if (exitCode !== 0) {
+    return c.json({
+      success: false,
+      error: compileError,
+    });
+  }
+
+  command = [output];
+
+  break;
+}
 
       default:
         return c.json({

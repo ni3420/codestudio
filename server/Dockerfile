@@ -1,14 +1,18 @@
 FROM oven/bun:1
 
-RUN apt-get update && apt-get install -y \
-    g++ \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    gdb \
     python3 \
-    nodejs \
+    default-jdk \
+    golang \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY package.json .
+COPY package.json bun.lock* ./
+
 RUN bun install
 
 COPY . .

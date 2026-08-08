@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: bun-app
+    ports:
+      - "3001:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: bun --watch run index.ts
